@@ -5290,6 +5290,31 @@ paths:
           $ref: "#/responses/genericError"
 
 # =============================================================================
+  /roomtypes/:
+    x-swagger-router-controller: roomtypes
+    get:
+      security:
+        - jwt: []
+      summary: Retrieve all roomtypes
+      tags: [ roomtypes ]
+      description: Retrieve all the room types that are available to choose from
+      operationId: findRoomTypes
+      responses:
+        200:
+          description: >-
+            Success, returns all Room Types.
+          schema:
+            $ref: "#/definitions/RoomTypeResponse"
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+
+# =============================================================================
   /logout:
     x-swagger-router-controller: logout
     get:
@@ -7278,6 +7303,17 @@ definitions:
         type: string
         description: >
           Timestamp at which the the write permission was modified
+
+  RoomTypeResponse:
+    type: object
+    description: A response for information about a room type
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      active:
+        type: boolean
 
 # =============================================================================
 parameters:
