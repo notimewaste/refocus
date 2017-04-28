@@ -5307,7 +5307,9 @@ paths:
           description: >-
             Success, returns all Room Types.
           schema:
-            $ref: "#/definitions/RoomTypeResponse"
+            type: array
+            items:
+              $ref: "#/definitions/RoomTypeResponse"
         400:
           $ref: "#/responses/400"
         401:
@@ -7343,11 +7345,11 @@ definitions:
           Timestamp at which the the write permission was modified
 
   RoomTypeResponse:
-    type: array
+    type: object
     description: A response for information about a room type
     properties:
       id:
-        type: string
+        type: integer
       name:
         type: string
       active:
