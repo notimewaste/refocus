@@ -21,8 +21,7 @@ module.exports = {
     PATCH: `Update selected attributes of ${m}`,
     POST: `Create a new ${m}`,
   },
-  baseUrl: '/v1/RoomTypes',
+  baseUrl: '/v1/roomtypes',
   model: RoomTypes,
   modelName: 'RoomTypes',
-  nameFinder: 'key',
 }; // exports

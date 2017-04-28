@@ -5290,15 +5290,18 @@ paths:
           $ref: "#/responses/genericError"
 
 # =============================================================================
-  /roomtypes/:
+  /roomtypes:
     x-swagger-router-controller: roomtypes
     get:
-      security:
-        - jwt: []
       summary: Retrieve all roomtypes
       tags: [ roomtypes ]
       description: Retrieve all the room types that are available to choose from
       operationId: findRoomTypes
+      parameters:
+        -
+          $ref: "#/parameters/limitParam"
+        -
+          $ref: "#/parameters/offsetParam"
       responses:
         200:
           description: >-
@@ -5311,6 +5314,41 @@ paths:
           $ref: "#/responses/401"
         404:
           $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      summary: Create a new room type
+      tags: [ roomtypes ]
+      description: Create a new room type with a name
+      operationId: postRoomTypes
+      parameters:
+        -
+          name: queryBody
+          in: body
+          required: true
+          schema:
+            type: object
+            description: Create Room Type properties
+            properties:
+              name:
+                type: string
+                maxLength: 254
+                description: Name of the room type
+              active:
+                type: boolean
+                description: If the room type is active
+            required:
+              - name
+      responses:
+        200:
+          description: >-
+            Created Room Type
+          schema:
+            $ref: "#/definitions/RoomTypeResponse"
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
         default:
           $ref: "#/responses/genericError"
 
@@ -7305,7 +7343,7 @@ definitions:
           Timestamp at which the the write permission was modified
 
   RoomTypeResponse:
-    type: object
+    type: array
     description: A response for information about a room type
     properties:
       id:

@@ -16,21 +16,16 @@ const assoc = {};
 
 module.exports = function user(seq, dataTypes) {
   const RoomTypes = seq.define('RoomTypes', {
-    id: {
-      type: dataTypes.UUID,
-      primaryKey: true,
-      defaultValue: dataTypes.UUIDV4,
-    },
     name: {
       type: dataTypes.STRING,
       allowNull: false,
       unique: true,
-      comment: 'Create a named room'
+      comment: 'Create a named room type'
     },
     active: {
       type: dataTypes.BOOLEAN,
       defaultValue: false,
-      comment: 'Determines if room is still active'
+      comment: 'Determines if room type is still active'
     }
   });
   return RoomTypes;
