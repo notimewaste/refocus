@@ -20,7 +20,7 @@ module.exports = function user(seq, dataTypes) {
       type: dataTypes.STRING,
       allowNull: false,
       unique: true,
-      comment: 'Reference Key for all room type settings'
+      comment: 'The criteria for a rule in a Lisps S-expressions JSON logic'
     }
   });
   return RoomRule;

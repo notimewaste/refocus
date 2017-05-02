@@ -36,11 +36,6 @@ module.exports = function user(seq, dataTypes) {
         assoc.type = Room.belongsTo(models.RoomTypes, {
           foreignKey: 'Type',
         });
-        assoc.connectedBot = Room.belongsToMany(models.Bot, {
-          as: 'bots',
-          through: 'RoomBots',
-          foreignKey: 'roomId',
-        });
       },
     }
   });

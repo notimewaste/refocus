@@ -18,7 +18,7 @@ module.exports = function user(seq, dataTypes) {
   const CurrentBotData = seq.define('CurrentBotData', {
     value: {
       type: dataTypes.STRING,
-      comment: 'Create a named room '
+      comment: 'Current Value for bot data'
     }
   }, {
     classMethods: {

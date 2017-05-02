@@ -19,7 +19,7 @@ module.exports = function user(seq, dataTypes) {
     name: {
       type: dataTypes.STRING,
       allowNull: false,
-      comment: 'Name of bot action'
+      comment: 'Name of bot data'
     },
     type: {
       type: dataTypes.ENUM('BOOLEAN', 'INTERGER', 'DECIMAL', 'ARRAY', 'STRING'),

@@ -22,6 +22,11 @@ module.exports = function user(seq, dataTypes) {
       unique: true,
       comment: 'Create a named bot '
     },
+    location: {
+      type: dataTypes.STRING,
+      allowNull: false,
+      comment: 'The URL to load UI from'
+    },
     active: {
       type: dataTypes.BOOLEAN,
       defaultValue: false,

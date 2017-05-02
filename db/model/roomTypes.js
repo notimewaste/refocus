@@ -41,6 +41,11 @@ module.exports = function user(seq, dataTypes) {
           as: 'rules',
           foreignKey: 'roomTypeId',
         });
+        assoc.connectedBot = RoomTypes.belongsToMany(models.Bot, {
+          as: 'bots',
+          through: 'RoomBots',
+          foreignKey: 'roomTypeId',
+        });
       },
     }
   });
