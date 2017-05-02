@@ -5290,71 +5290,6 @@ paths:
           $ref: "#/responses/genericError"
 
 # =============================================================================
-  /roomtypes:
-    x-swagger-router-controller: roomtypes
-    get:
-      summary: Retrieve all roomtypes
-      tags: [ roomtypes ]
-      description: Retrieve all the room types that are available to choose from
-      operationId: findRoomTypes
-      parameters:
-        -
-          $ref: "#/parameters/limitParam"
-        -
-          $ref: "#/parameters/offsetParam"
-      responses:
-        200:
-          description: >-
-            Success, returns all Room Types.
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/RoomTypeResponse"
-        400:
-          $ref: "#/responses/400"
-        401:
-          $ref: "#/responses/401"
-        404:
-          $ref: "#/responses/404"
-        default:
-          $ref: "#/responses/genericError"
-    post:
-      summary: Create a new room type
-      tags: [ roomtypes ]
-      description: Create a new room type with a name
-      operationId: postRoomTypes
-      parameters:
-        -
-          name: queryBody
-          in: body
-          required: true
-          schema:
-            type: object
-            description: Create Room Type properties
-            properties:
-              name:
-                type: string
-                maxLength: 254
-                description: Name of the room type
-              active:
-                type: boolean
-                description: If the room type is active
-            required:
-              - name
-      responses:
-        200:
-          description: >-
-            Created Room Type
-          schema:
-            $ref: "#/definitions/RoomTypeResponse"
-        400:
-          $ref: "#/responses/400"
-        403:
-          $ref: "#/responses/403"
-        default:
-          $ref: "#/responses/genericError"
-
-# =============================================================================
   /logout:
     x-swagger-router-controller: logout
     get:
@@ -6160,6 +6095,138 @@ paths:
             details.
           schema:
             $ref: '#/definitions/ErrorResponse'
+
+# =============================================================================
+  /rooms:
+    x-swagger-router-controller: rooms
+    get:
+      summary: Retrieve all roomtypes
+      tags: [ rooms ]
+      description: Retrieve all the room types that are available to choose from
+      operationId: findRooms
+      parameters:
+        -
+          name: active
+          description: Request body.
+          in: query
+          required: false
+          type: boolean
+        -
+          $ref: "#/parameters/limitParam"
+        -
+          $ref: "#/parameters/offsetParam"
+      responses:
+        200:
+          description: >-
+            Success, returns all Room Types.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/RoomResponse"
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      summary: Create a new room type
+      tags: [ rooms ]
+      description: Create a new room type with a name
+      operationId: postRooms
+      parameters:
+        -
+          name: queryBody
+          in: body
+          required: true
+          schema:
+            type: object
+            description: Create Room Type properties
+            properties:
+              name:
+                type: string
+                maxLength: 254
+                description: Name of the room type
+              active:
+                type: boolean
+                description: If the room type is active
+            required:
+              - name
+      responses:
+        200:
+          description: >-
+            Created Room Type
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        default:
+          $ref: "#/responses/genericError"
+
+# -----------------------------------------------------------------------------
+  /roomtypes:
+    x-swagger-router-controller: roomtypes
+    get:
+      summary: Retrieve all roomtypes
+      tags: [ roomtypes ]
+      description: Retrieve all the room types that are available to choose from
+      operationId: findRoomTypes
+      parameters:
+        -
+          $ref: "#/parameters/limitParam"
+        -
+          $ref: "#/parameters/offsetParam"
+      responses:
+        200:
+          description: >-
+            Success, returns all Room Types.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/RoomTypeResponse"
+        400:
+          $ref: "#/responses/400"
+        401:
+          $ref: "#/responses/401"
+        404:
+          $ref: "#/responses/404"
+        default:
+          $ref: "#/responses/genericError"
+    post:
+      summary: Create a new room type
+      tags: [ roomtypes ]
+      description: Create a new room type with a name
+      operationId: postRoomTypes
+      parameters:
+        -
+          name: queryBody
+          in: body
+          required: true
+          schema:
+            type: object
+            description: Create Room Type properties
+            properties:
+              name:
+                type: string
+                maxLength: 254
+                description: Name of the room type
+              active:
+                type: boolean
+                description: If the room type is active
+            required:
+              - name
+      responses:
+        200:
+          description: >-
+            Created Room Type
+        400:
+          $ref: "#/responses/400"
+        403:
+          $ref: "#/responses/403"
+        default:
+          $ref: "#/responses/genericError"
 
 # =============================================================================
 definitions:
@@ -7343,6 +7410,22 @@ definitions:
         type: string
         description: >
           Timestamp at which the the write permission was modified
+
+  RoomResponse:
+    type: object
+    description: A response for information about a room
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      active:
+        type: boolean
+      type:
+        readOnly: true
+        $ref: "#/definitions/RoomTypeResponse"
+        description: >
+          The room type of the room
 
   RoomTypeResponse:
     type: object

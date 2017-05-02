@@ -7,7 +7,7 @@
  */
 
 /**
- * db/model/roomTypes.js
+ * db/model/roomLog.js
  */
 const common = require('../helpers/common');
 const constants = require('../constants');
@@ -15,34 +15,28 @@ const constants = require('../constants');
 const assoc = {};
 
 module.exports = function user(seq, dataTypes) {
-  const RoomTypes = seq.define('RoomTypes', {
-    name: {
+  const RoomLog = seq.define('RoomLog', {
+    log: {
       type: dataTypes.STRING,
       allowNull: false,
-      unique: true,
-      comment: 'Create a named room type'
-    },
-    active: {
-      type: dataTypes.BOOLEAN,
-      defaultValue: false,
-      comment: 'Determines if room type is still active'
+      comment: 'Reference Key for all room type settings'
     }
   }, {
     classMethods: {
-      getRoomTypeAssociations() {
+      getRoomLogAssociations() {
         return assoc;
       },
       postImport(models) {
-        assoc.settings = RoomTypes.hasMany(models.RoomSetting, {
-          as: 'settings',
-          foreignKey: 'roomTypeId',
+        assoc.room = RoomLog.belongsTo(models.Room, {
+          foreignKey: 'roomId',
         });
-        assoc.rules = RoomTypes.hasMany(models.RoomRule, {
-          as: 'rules',
-          foreignKey: 'roomTypeId',
+        assoc.bot = RoomLog.belongsTo(models.Bot, {
+          foreignKey: 'botId',
+        });
+        assoc.bot = RoomLog.belongsTo(models.User, {
+          foreignKey: 'userId',
         });
       },
     }
-  });
-  return RoomTypes;
+  });  return RoomLog;
 };
