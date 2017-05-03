@@ -11,6 +11,7 @@
  */
 'use strict'; // eslint-disable-line strict
 const sampleStore = require('../../cache/sampleStore');
+const ssConstants = sampleStore.constants;
 const samstoinit = require('../../cache/sampleStoreInit');
 const redisClient = require('../../cache/redisCache').client.sampleStore;
 const featureToggles = require('feature-toggles');
@@ -22,6 +23,8 @@ const Subject = tu.db.Subject;
 const Sample = tu.db.Sample;
 const initialFeatureState = featureToggles
   .isFeatureEnabled(sampleStore.constants.featureName);
+const subAspMapType = ssConstants.prefix + ssConstants.separator +
+  ssConstants.objectType.subAspMap;
 
 describe('sampleStore (feature off):', () => {
   before(() => tu.toggleOverride(sampleStore.constants.featureName, false));
@@ -45,7 +48,10 @@ describe('sampleStore (feature on):', () => {
   let s1;
   let s2;
   let s3;
-
+  let user1;
+  let user2;
+  let user3;
+  let user4;
   before((done) => {
     tu.toggleOverride(sampleStore.constants.featureName, true);
     Aspect.create({
@@ -84,6 +90,26 @@ describe('sampleStore (feature on):', () => {
       okRange: [10, 100],
     }))
     .then((created) => (a4 = created))
+    .then(() => tu.createUser('myUNiqueUser1'))
+    .then((usr) => {
+      user1 = usr;
+      return a1.addWriter(user1);
+    })
+    .then(() => tu.createUser('myUniqueUser2'))
+    .then((usr) => {
+      user2 = usr;
+      return a1.addWriter(user2);
+    })
+    .then(() => tu.createUser('myUniqueUser3'))
+    .then((usr) => {
+      user3 = usr;
+      return a1.addWriter(user3);
+    })
+    .then(() => tu.createUser('myUniqueUser4'))
+    .then((usr) => {
+      user4 = usr;
+      return a2.addWriter(user4);
+    })
     .then(() => Subject.create({
       isPublished: true,
       name: `${tu.namePrefix}Subject1`,
@@ -173,9 +199,63 @@ describe('sampleStore (feature on):', () => {
       expect(res.includes('samsto:subject:___subject1.___subject3'))
         .to.be.true;
     })
+     .then(() => redisClient
+      .keysAsync(subAspMapType + '*'))
+    .then((res) => {
+      expect(res.includes('samsto:subaspmap:___subject1.___subject2'))
+        .to.be.true;
+      expect(res.includes('samsto:subaspmap:___subject1.___subject3'))
+        .to.be.true;
+    })
+    .then(() =>
+      redisClient.smembersAsync('samsto:subaspmap:___subject1.___subject2'))
+    .then((res) => {
+      expect(res.includes(['aspect1', 'aspect2']));
+    })
     .then(() => samstoinit.init())
     .then((res) => expect(res).to.not.be.false)
     .then(() => done())
     .catch(done);
+  });
+
+  it('aspects with associated writers should have its ' +
+      'writers field populated', (done) => {
+    samstoinit.eradicate()
+    .then(() => redisClient.keysAsync(sampleStore.constants.prefix + '*'))
+    .then((res) => expect(res.length).to.eql(0))
+    .then(() => samstoinit.populate())
+    .then(() =>
+      redisClient.hgetallAsync('samsto:aspect:___aspect1'))
+    .then((aspect) => {
+      sampleStore.arrayStringsToJson(aspect,
+          sampleStore.constants.fieldsToStringify.aspect);
+      expect(aspect.writers.length).equal(3);
+      expect(aspect.writers).to.have
+        .members([user1.name, user2.name, user3.name]);
+    })
+    .then(() =>
+      redisClient.hgetallAsync('samsto:aspect:___aspect2'))
+    .then((aspect) => {
+      sampleStore.arrayStringsToJson(aspect,
+        sampleStore.constants.fieldsToStringify.aspect);
+      expect(aspect.writers.length).to.equal(1);
+      expect(aspect.writers).to.have
+        .members([user4.name]);
+    })
+    .then(() => samstoinit.init())
+    .then((res) => expect(res).to.not.be.false)
+    .then(() => done())
+    .catch(done);
+  });
+
+  it('eradicate should delete all the objects in redis ' +
+    'having the sample store prefix', (done) => {
+    samstoinit.populate()
+    .then(() => samstoinit.eradicate())
+    .then(() => redisClient.keysAsync(sampleStore.constants.prefix + '*'))
+    .then((res) => {
+      expect(res.length).to.eql(0);
+      done();
+    }).catch(done);
   });
 });

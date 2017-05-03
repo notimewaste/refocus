@@ -28,6 +28,7 @@ const constants = {
       'warningRange',
       'infoRange',
       'okRange',
+      'writers',
     ],
     sample: ['relatedLinks'],
     subject: ['aspectNames'],
@@ -37,7 +38,8 @@ const constants = {
     sample: PFX + SEP + 'samples',
     subject: PFX + SEP + 'subjects',
   },
-  objectType: { aspect: 'aspect', sample: 'sample', subject: 'subject' },
+  objectType: { aspect: 'aspect', sample: 'sample', subject: 'subject',
+    subAspMap: 'subaspmap', },
   prefix: PFX,
   separator: SEP,
   previousStatusKey: PFX + SEP + 'previousSampleStoreStatus',
@@ -111,26 +113,28 @@ function removeNullsAndStringifyArrays(obj, arrayFields) {
  * ie. input value: Mon Apr 03 2017 14:10:57 GMT-0700 (PDT)
  * output value: 2017-03-14T02:22:42.255Z
  *
- * @param {Object} Contains keys whose values need be converted
+ * @param {Object} obj - Contains keys whose values need be converted
  * If value is provided, return the ISO formatted date.
  * If no value, return the ISO formatted date with now time.
+ * @returns {String} The date string in ISO format.
+
  */
 function convertToISO(obj) {
-  let key = '';
-  for (let j = constants.ISOfields.length - 1; j >= 0; j--) {
-    key = constants.ISOfields[j];
-    obj[key] = obj[key] ? obj[key].toISOString() :
-      new Date().toISOString();
-  }
-
+  constants.ISOfields.forEach((field) => {
+    if (!obj[field]) {
+      obj[field] = new Date().toISOString();
+    } else if (obj[field] && obj[field].toISOString) {
+      obj[field] = obj[field].toISOString();
+    }
+  });
   return obj;
 }
 
 /**
  * Remove nulls and stringify arrays.
  *
- * @param {Object} a - The aspect to clean. This can be either be a sequelize
- * object instance or just a regular object.
+ * @param {Object} subj - The subject to clean. This can be either be a
+ * sequelize object instance or just a regular object.
  * @returns {Object} cleaned up and ready to store in redis.
  */
 function cleanSubject(subj) {
@@ -177,29 +181,6 @@ function cleanSample(s) {
   return retval;
 } // cleanSample
 
-/**
- * Checks if the aspect corresponding to a sample is writable by the given user.
- *
- * @param  {Model}  aspectModel - The model object
- * @param  {String}  aspectName  - The name of the aspect
- * @param  {String}  userName  - The user name
- * @returns {Boolean} - returns true if the sample is writable by the given user
- */
-function isSampleWritable(aspectModel, aspectName, userName) {
-  const options = {};
-  options.where = { name: { $iLike: aspectName } };
-  return aspectModel.findOne(options)
-  .then((aspect) => {
-    if (!aspect) {
-      throw new redisErrors.ResourceNotFoundError({
-        explanation: 'Aspect not found.',
-      });
-    }
-
-    return Promise.resolve(aspect.isWritableBy(userName));
-  });
-} // isSampleWritable
-
 module.exports = {
   cleanAspect,
   cleanSubject,
@@ -208,5 +189,4 @@ module.exports = {
   toKey,
   arrayStringsToJson,
   getNameFromKey,
-  isSampleWritable,
 };

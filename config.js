@@ -29,6 +29,12 @@ const pgport = pe.PGPORT || defaultPostgresPort;
 const defaultDbUrl = 'postgres://' + pguser + ':' + pgpass + '@' + pghost +
   ':' + pgport + '/' + pgdatabase;
 const DEFAULT_LOCAL_REDIS_URL = '//127.0.0.1:6379';
+const DEFAULT_DB_CONNECTION_POOL = { // sequelize defaults
+  max: 5,
+  min: 0,
+  idle: 10000,
+};
+const swagger = pe.ENABLE_ROOMS ? './api/v1/rooms-swagger.yaml' : './api/v1/swagger.yaml';//Enable Rooms Routes
 
 // By default, allow all IP's
 const ipWhitelist = pe.IP_WHITELIST || '[[0.0.0.0,255.255.255.255]]';
@@ -103,7 +109,7 @@ module.exports = {
       offset: 10,
     },
     swagger: {
-      doc: './api/v1/swagger.yaml',
+      doc: swagger,
       router: {
         controllers: './api/v1/controllers',
       },
@@ -128,6 +134,11 @@ module.exports = {
       email: 'admin@refocus.admin',
       name: 'admin@refocus.admin',
       password: 'password',
+    },
+    connectionPool: {
+      max: pe.DB_CONNECTION_POOL_MAX || DEFAULT_DB_CONNECTION_POOL.max,
+      min: pe.DB_CONNECTION_POOL_MIN || DEFAULT_DB_CONNECTION_POOL.min,
+      idle: pe.DB_CONNECTION_POOL_IDLE || DEFAULT_DB_CONNECTION_POOL.idle,
     },
     modelDirName: 'model',
     passwordHashSaltNumRounds: 8,
@@ -211,6 +222,7 @@ module.exports = {
   deprioritizeJobsFrom,
   endpointToLimit,
   httpMethodToLimit,
+  kueStatsInactiveWarning: pe.KUESTATS_INACTIVE_WARNING,
   nodeEnv,
   payloadLimit,
   persistRedisSampleStoreMilliseconds:
