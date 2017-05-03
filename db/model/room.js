@@ -34,7 +34,7 @@ module.exports = function user(seq, dataTypes) {
       },
       postImport(models) {
         assoc.type = Room.belongsTo(models.RoomTypes, {
-          foreignKey: 'Type',
+          foreignKey: 'type',
         });
       },
     }

@@ -10,7 +10,7 @@
  * api/v1/helpers/nouns/roomtypes.js
  */
 
-const Rooms = require('../../../../db/index').Rooms;
+const Rooms = require('../../../../db/index').Room;
 
 const m = 'Rooms';
 
